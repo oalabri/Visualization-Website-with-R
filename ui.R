@@ -37,6 +37,12 @@ ui <- dashboardPage(
       ),
 
       menuItem(
+        "Manual Plottig",
+        tabName = "manual_plotting",
+        icon = icon("play")
+      ),
+
+      menuItem(
         "Best Predictor",
         tabName = "Best_Predictor",
         icon = icon("play")
@@ -127,14 +133,18 @@ ui <- dashboardPage(
         fluidRow(
           box(
             width = 8,
+            div(
+              style = "display: flex; flex-direction: column; align-items: center; font-size: 25px;",
+              p("Would you like to allow generating choatic plots? (Unlocks all plotting choices)"),
+              checkboxInput("allow_choas", "Yes")
+            ),
+          ),
+          box(
+            width = 8,
             title = "Plotting choices",
             status = "primary",
             solidHeader = TRUE,
-            selectInput(
-              "plot_type",
-              "Select Plot type",
-              choices = c("Scatter" = "point", "Line" = "line", "Bar" = "bar")
-            ),
+
             selectInput(
               "x_var",
               "X variable:",
@@ -143,6 +153,11 @@ ui <- dashboardPage(
             selectInput(
               "y_var",
               "Y variable:",
+              choices = NULL
+            ),
+            selectInput(
+              "plot_type",
+              "Select Plot type",
               choices = NULL
             ),
             hr(),
@@ -164,12 +179,24 @@ ui <- dashboardPage(
       ),
 
       tabItem(
+        tabName = "manual_plotting",
+        fluidRow(
+          div(
+            style = "font-size: 30px;",
+            p("Still working on this")
+
+          )
+        )
+
+      ),
+
+      tabItem(
         tabName = "Best_Predictor",
         fluidRow(
           p("You must choose columns to perform regression",
-          style= "text-align: center;"),
+          style= "text-align: center; font-size: 25px;"),
           p("STILL DOESNT SUPPORT Y BEING MORE THAN 2 CATAGORIES",
-          style= "text-align: center;"),
+          style= "text-align: center; font-size: 15px;"),
           box(
             width = 4,
             title = "Parameters selection",
@@ -217,6 +244,11 @@ ui <- dashboardPage(
       tabItem(
         tabName = "Explore_variences",
         fluidRow(
+          div(
+            style= "text-align: center; font-size: 25px;",
+            p("You can compare two columns variances and plot each column's variance")
+
+          ),
           box(
             width = 12,
             title = "Choose columns",
@@ -296,7 +328,7 @@ ui <- dashboardPage(
               tags$li("Phone: ---"),
               tags$li("Discord: os.abri")
             ),
-            p("My GitHub: https://github.com/Oalabri09")
+            p("My GitHub: https://github.com/oalabri")
           )
         )
       )

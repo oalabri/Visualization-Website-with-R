@@ -14,6 +14,7 @@ server <- function(input, output, session) {
     names(data())[is_categorical]
   })
 
+
   numChoices <- reactive({
     req(data())
     is_numeric <- sapply(data(), function(col) {
@@ -22,15 +23,25 @@ server <- function(input, output, session) {
     names(data())[is_numeric]
   })
 
+  all_2_choices <- reactive({
+    req(data())
+    is_categorical2 <- sapply(data(), function(col) {
+      length(unique(col)) == 2
+    })
+    cata <- names(data())[is_categorical2]
+    union(cata, numChoices())
+  })
+
   observeEvent(data(), {
     allchoices <- colnames(data())
+    all_2_choices <- all_2_choices()
 
 
     updateSelectInput(session, "x_var", choices = allchoices)
     updateSelectInput(session, "y_var", choices = allchoices)
 
     updateSelectInput(session, "x_predict", choices = allchoices)
-    updateSelectInput(session, "y_predict", choices = allchoices)
+    updateSelectInput(session, "y_predict", choices = all_2_choices)
 
     updateSelectInput(session, "x_varience", choices = allchoices)
     updateSelectInput(session, "y_varience", choices = allchoices)
@@ -42,7 +53,7 @@ server <- function(input, output, session) {
   })
 
   uploadServer(output, data)
-  visualizeServer(input, output, data)
+  visualizeServer(input, output, data, cataChoices = cataChoices, numChoices = numChoices)
   modelServer(input, output, data, cataChoices = cataChoices)
   varianceServer(input, output, data, cataChoices = cataChoices, numChoices = numChoices)
 }
