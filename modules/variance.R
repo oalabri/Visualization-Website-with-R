@@ -70,7 +70,6 @@ varianceServer <- function(input, output, data, cataChoices, numChoices) {
            Cramer's V : {cramer_v},
            Entropy_x : {entropy_x},
            Entropy_y : {entropy_y}
-
            ")
 
 
@@ -143,21 +142,21 @@ varianceServer <- function(input, output, data, cataChoices, numChoices) {
             if (var %in% numChoices && input$variance_plot_type == "Boxplot"){
                 p <- ggplot(data, aes(x = "", y = .data[[var]]))+
                 geom_boxplot()+
-                theme_minimal()
+                theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
                 return(plotly::ggplotly(p))
 
             } else if (var %in% numChoices && input$variance_plot_type == "Violen") {
                 p <- ggplot(data, aes(x = "", y = .data[[var]]))+
                 geom_violin()+
-                theme_minimal()
+                theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
                 return(plotly::ggplotly(p))
 
             } else if(var %in% cataChoices){
                 p <- ggplot(data, aes(x = .data[[var]]))+
                 geom_bar()+
-                theme_minimal()
+                theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
                 return(plotly::ggplotly(p))
 
@@ -170,14 +169,22 @@ varianceServer <- function(input, output, data, cataChoices, numChoices) {
         plots_list = purrr::compact(plots_list)
         if (length(plots_list) == 0) return(NULL)
         num_cols <- if (length(plots_list) > 3) 2 else length(plots_list)
+        num_rows = ceiling(length(plots_list) / num_cols)
 
         combined_plots = plotly::subplot(
             plots_list,
-            nrows = ceiling(length(plots_list) / num_cols),
-            margin = 0.05,
+            nrows = num_rows,
+            margin = 0.1,
             titleX = TRUE,
             titleY = TRUE
         )
+
+        combined_plots = plotly::layout(
+            combined_plots,
+            height = 400 * num_rows,
+            autosize = TRUE
+        )
+
 
         return(combined_plots)
 

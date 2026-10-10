@@ -251,7 +251,7 @@ ui <- dashboardPage(
           ),
           box(
             width = 12,
-            title = "Choose columns",
+            title = "Choose columns to compare",
             status = "primary",
             solidHeader = TRUE,
             selectInput(
@@ -271,14 +271,106 @@ ui <- dashboardPage(
               icon = icon("play")
             )
           ),
+
           box(
             width = 12,
             title = "Comparison information",
             status = "primary",
             solidHeader = TRUE,
             tableOutput("info_table"),
-            verbatimTextOutput("info_compare")
+            verbatimTextOutput("info_compare"),
+
+
+            plotOutput("variance_plot"),
+
+            
+            actionButton(
+              "show_stats",
+              "Understand the Statistics",
+              icon = icon("circle-question")
+            ),
+
+            
+            conditionalPanel(
+              condition = "input.show_stats > 0",
+
+              wellPanel(
+                h3("Understanding Your Results"),
+
+                h4("Levene's Test p-value"),
+                p("Checks whether the groups have different variances.
+                  A p-value below 0.05 suggests that their variances differ."),
+
+                h4("ANOVA p-value"),
+                p("Checks whether the group averages are different.
+                  It does not directly compare variances."),
+
+                h4("Correlation Coefficient (r)"),
+                p("Measures how strongly two numerical variables are
+                  related. Values near -1 or +1 indicate a strong
+                  linear relationship; values near 0 indicate a weak
+                  linear relationship."),
+
+                h4("F-statistic"),
+                p("For a direct comparison of two variances, it is
+                  the ratio of the sample variances. A value near 1
+                  means the sample variances are similar."),
+
+                h4("Comparison p-value"),
+                p("A value below 0.05 usually indicates a statistically
+                  significant difference between the variances."),
+
+                h4("Degrees of Freedom"),
+                p("Describe how much independent information is used
+                  in the statistical test. They help determine the
+                  p-value and confidence interval."),
+
+                h4("95% Confidence Interval for the Ratio of Variances"),
+                p("Gives a range of plausible values for the ratio
+                  of the population variances. If the interval excludes
+                  1, it suggests that the variances differ significantly
+                  at the 5% level."),
+
+                h4("Chi-square Statistic"),
+                p("Measures how different the observed category counts are
+                  from the counts we would expect if the two categorical
+                  variables were unrelated. A larger value generally means
+                  a bigger difference between observed and expected counts."),
+
+                h4("Chi-square p-value"),
+                p("Tells us whether there is evidence of a relationship
+                  between the two categorical variables. A p-value below
+                  0.05 suggests a statistically significant association.
+                  A p-value of 0.05 or higher means there is not enough
+                  evidence to conclude that an association exists."),
+
+                h4("Cramer's V"),
+                p("Measures the strength of the relationship between
+                  two categorical variables. It ranges from 0 to 1.
+                  A value near 0 means a weak or no association, while
+                  a value near 1 means a strong association. The meaning
+                  of intermediate values depends on the data and table size."),
+
+                h4("Entropy X"),
+                p("Measures how spread out the categories of variable X are.
+                  An entropy near 0 means most or all observations belong
+                  to one category. Higher entropy means the observations
+                  are more evenly distributed across categories."),
+
+                h4("Entropy Y"),
+                p("Measures how spread out the categories of variable Y are.
+                  An entropy near 0 means most or all observations belong
+                  to one category. Higher entropy means the observations
+                  are more evenly distributed across categories.")
+              )
+            ),
+
           ),
+
+          
+          
+
+
           box(
             width = 12,
             title = "Choose columns to plot",
@@ -310,7 +402,7 @@ ui <- dashboardPage(
             solidHeader = TRUE,
             plotlyOutput("plot_variance_out")
 
-          ),
+          )
           )
         ),
 
