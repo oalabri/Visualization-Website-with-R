@@ -13,6 +13,16 @@ modelServer <- function(input, output, data, cataChoices) {
       dataCopy <- modelData
       formula <- as.formula(paste(y_var, "~", x))
 
+      if (x == y_var){
+        next
+      }
+
+      unique_vals <- unique(na.omit(dataCopy[[x]]))
+      if (length(unique_vals) < 2) {
+        print(paste("Skipping predictor", x, "because it has fewer than 2 unique values."))
+        next
+      }
+
       if (y_var %in% cataChoices) { 
         dataCopy[[y_var]] <- as.factor(dataCopy[[y_var]])
       }
@@ -38,7 +48,12 @@ modelServer <- function(input, output, data, cataChoices) {
         fit <- lm(formula, data = dataCopy)
       }
 
-      results[[x]] <- summary(fit)
+      s <- summary(fit)
+      results[[x]] <- list(
+        coefficients = s$coefficients,
+        fit = fit,
+        adj.r.squared = s$adj.r.squared
+      )
 
     }
     return(results)
@@ -49,9 +64,9 @@ modelServer <- function(input, output, data, cataChoices) {
     cataChoices = cataChoices()
     for (predictor in names(result)) {
       coef_matrix <- result[[predictor]]$coefficients
-      cat("=================================\n")
+      cat("==================================================================\n")
       cat("Model predicting:", input$y_predict, "using", predictor, "\n")
-      cat("=================================\n")
+      cat("==================================================================\n")
       print(result[[predictor]]$coefficients)
 
       if (input$y_predict %in% cataChoices) {
@@ -64,6 +79,7 @@ modelServer <- function(input, output, data, cataChoices) {
               cat("\nThis is significant !!!\n")
             } else {
               cat("\n variable componant: ", rownames(coef_matrix)[i], "\n")
+              cat("\nThis is NOT significant \n")
             }
           }
         }
@@ -86,4 +102,40 @@ modelServer <- function(input, output, data, cataChoices) {
 
     }
   })
+
+  output$residual_plot <- renderPlot({
+    result <- model_output()
+    cataChoices = cataChoices()
+    
+    if (input$y_predict %in% cataChoices) {
+      return(NULL) 
+    }
+
+    valid_predictors <- c()
+    for (predictor in names(result)) {
+      if (!predictor %in% cataChoices) {
+        valid_predictors <- c(valid_predictors, predictor)
+      }
+    }
+    
+    n_models <- length(valid_predictors)
+    if (n_models == 0) return(NULL)
+    
+    cols <- min(n_models, 2)
+    rows <- ceiling(n_models / cols)
+    par(mfrow = c(rows, cols))
+    
+    for (predictor in valid_predictors) {
+      model_obj <- result[[predictor]]$fit
+      
+      if (!is.null(tryCatch(residuals(model_obj), error = function(e) NULL))) {
+        plot(model_obj, which = 1, main = paste("Residuals:", predictor))
+      }
+    }
+    
+    # Reset the plotting layout back to default
+    par(mfrow = c(1, 1))
+  })
+
+
 }

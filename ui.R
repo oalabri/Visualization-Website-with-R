@@ -235,7 +235,8 @@ ui <- dashboardPage(
             title = "Regression summaries",
             status = "primary",
             solidHeader = TRUE,
-            verbatimTextOutput("model_results")
+            verbatimTextOutput("model_results"),
+            plotOutput("residual_plot", height = "600px")
           )
         )
 
